@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Archive | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="archive.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <header class="top" id="top"></header>
+    <main>
+      <section class="ah">
+        <span class="bi"><i data-i="folder"></i></span>
+        <div>
+          <h1>Archive</h1>
+          <p>Browse all archived capstone projects from the CMU-CCS repository.</p>
+        </div>
+      </section>
+      <section class="shell">
+        <div class="srow">
+          <label class="sf"><i data-i="search"></i><input aria-label="Search archive" id="q" placeholder="Search by title, author, category, or year..." type="search"/></label>
+          <button id="go" type="button">Search</button>
+        </div>
+        <div class="frow">
+          <select id="f-category"><option value="">All Categories</option></select>
+          <select id="f-year"><option value="">All Years</option></select>
+          <select id="f-tech"><option value="">All Technologies</option></select>
+          <select aria-label="Sort" class="sort" id="sort"><option>Newest First</option><option>Oldest First</option><option>Title A-Z</option></select>
+        </div>
+        <div class="abody">
+          <aside>
+            <div class="cats">
+              <h2>Categories</h2>
+              <div id="cl"></div>
+            </div>
+            <div class="tot">
+              <span class="ti"><i data-i="folder"></i></span>
+              <div><small>Total Projects</small><b id="tot">0</b><span>Archived capstone projects from CMU-CCS repository.</span></div>
+            </div>
+          </aside>
+          <div class="pgrid" id="list"></div>
+        </div>
+      </section>
+    </main>
+    <div class="modal" id="modal"></div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="student.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        filters("", PROJECTS);
+        let cat = "All Projects";
+        const CAT = {"Web Development": ["blue", "laptop"], "Mobile Application": ["purple", "phone"], "Database": ["green", "db"], "IoT": ["orange", "cloud"], "Data Analytics": ["cyan", "chart"], "Healthcare": ["teal", "heart"], "Education": ["red", "cap"], "Finance": ["violet", "list"], "Gaming": ["lime", "gamepad"], "Cybersecurity": ["slate", "shield"]};
+        const HEX = {blue: "#1664ff", purple: "#7b2ff7", green: "#16a05a", orange: "#f08a00", cyan: "#0e9fbf", teal: "#12a594", red: "#e0314f", violet: "#6d4bd6", lime: "#4caf50", slate: "#475569"};
+        const look = p => CAT[p.category] || ["slate", "folder"];
+        const cats = ["All Projects", ...new Set(PROJECTS.map(p => p.category)), "Saved Projects"];
+        function visible() {
+          const s = saved();
+          let list = applyFilters(PROJECTS);
+          if (cat === "Saved Projects") list = list.filter(p => s.includes(p.id));
+          else if (cat !== "All Projects") list = list.filter(p => p.category === cat);
+          const sort = $("#sort").value;
+          const order = sort === "Oldest First" ? (a, b) => a.year - b.year : sort === "Title A-Z" ? (a, b) => a.title.localeCompare(b.title) : (a, b) => b.year - a.year;
+          return list.slice().sort(order);
+
+        }
+        window.refresh = () => {
+          const s = saved();
+          $("#cl").innerHTML = cats.map(c => {
+            const icon = c === "All Projects" ? "folder" : c === "Saved Projects" ? "check" : (CAT[c] || ["slate", "folder"])[1];
+            return `<button data-c="${c}" class="${c === cat ? "on" : ""}"><i data-i="${icon}"></i>${c}</button>`;
+
+          }).join("");
+          $("#tot").textContent = PROJECTS.length;
+          const list = visible();
+          $("#list").innerHTML = list.length ? list.map(p => {
+            const[tone, icon] = look(p);
+            return `<article class="pc tn-${tone}"><div class="pt"><span class="pi"><i data-i="${icon}"></i></span><span class="pill2">${p.category}</span></div><h3>${p.title}</h3><div class="pm"><span><i data-i="calendar"></i>${p.year}</span><span><i data-i="tag"></i>${p.category}</span></div><div class="pa"><i data-i="user"></i>${p.authors}</div>${s.includes(p.id) ? '<span class="sv">Saved</span>' : ""}<button class="pv" data-id="${p.id}">View Details<i data-i="arrow"></i></button></article>`;
+
+          }).join("") : `<p class="none">${cat === "Saved Projects" ? "No saved projects yet. Open a project and select Save to Archive." : "No capstone projects match your search or filters."}</p>`;
+
+        };
+        function openBook(id) {
+          const p = PROJECTS.find(x => x.id === id);
+          log("Viewed Project", p.title);
+          let tab = 0;
+          const draw = () => {
+            const isSaved = saved().includes(id);
+            const tabs = ["Overview", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4", "Chapter 5"];
+            const body = tab === 0 ? overviewHTML(p) : `<h3>${CHAPTER_TITLES[tab - 1]}</h3>${chapterBody(p, tab - 1)}`;
+            $("#modal").innerHTML = `<div class="box reader"><div class="rh" style="--c:${HEX[look(p)[0]]}"><h2>${p.title}</h2><p>${p.authors} · ${p.year} · ${p.program}</p></div><div class="tabs">${tabs.map((t, i) => `<button data-t="${i}" class="${i === tab ? "on" : ""}">${t}</button>`).join("")}</div><div class="rb">${body}</div><div class="row"><button class="btn ghost" id="sv2">${isSaved ? "Remove from Archive" : "Save to Archive"}</button><button class="btn" id="cl2">Close</button></div></div>`;
+            $("#modal").querySelector(".tabs").onclick = e => {
+              const b = e.target.closest("button[data-t]");
+              if (b) {
+                tab = +b.dataset.t;
+                draw();
+
+              }
+
+            };
+            $("#cl2").onclick = () => $("#modal").classList.remove("open");
+            $("#sv2").onclick = () => {
+              toggleSave(id);
+              toast(saved().includes(id) ? "Saved to your archive." : "Removed from your archive.");
+              draw();
+              refresh();
+
+            };
+
+          };
+          draw();
+          $("#modal").classList.add("open");
+
+        }
+        $("#list").onclick = e => {
+          const b = e.target.closest(".pv");
+          if (b) openBook(+b.dataset.id);
+
+        };
+        $("#cl").onclick = e => {
+          const b = e.target.closest("button[data-c]");
+          if (b) {
+            cat = b.dataset.c;
+            $("#f-category").value = "";
+            refresh();
+
+          }
+
+        };
+        $("#f-category").addEventListener("input", () => {
+          cat = "All Projects";
+          refresh();
+
+        });
+        $("#go").onclick = refresh;
+        document.querySelectorAll("#q,#f-year,#f-tech,#sort").forEach(e => e.addEventListener("input", refresh));
+        refresh();
+
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Admin Dashboard | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="admin-dashboard.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <h1 id="wl">Welcome, Admin!</h1>
+          <p class="sub">Manage users, access, system information, and activity.</p>
+          <section class="stats5" id="st"></section>
+          <section class="mgr">
+            <div class="card">
+              <h2>Management Tools</h2>
+              <div class="tools">
+                <a class="tl" href="admin-users.html"><span class="ic"><i data-i="users"></i></span><div><b>User Management</b><p>View accounts, activate/deactivate accounts, manage access, and reset account access.</p></div><i class="go" data-i="arrow"></i></a>
+                <a class="tl" href="admin-email-management.html"><span class="ic g"><i data-i="mail"></i></span><div><b>CMU-CCS Email Management</b><p>Add, update, deactivate, and maintain authorized CMU-CCS emails.</p></div><i class="go" data-i="arrow"></i></a>
+                <a class="tl" href="admin-role-access.html"><span class="ic pu"><i data-i="shield"></i></span><div><b>Role &amp; Access Management</b><p>Assign or update Student and Faculty roles. The Admin account is managed by the system.</p></div><i class="go" data-i="arrow"></i></a>
+                <a class="tl" href="admin-categories-tags.html"><span class="ic pu"><i data-i="tag"></i></span><div><b>Categories &amp; Technology Tags</b><p>Manage categories and technology tags.</p></div><i class="go" data-i="arrow"></i></a>
+                <a class="tl" href="admin-activity-logs.html"><span class="ic sl"><i data-i="clock"></i></span><div><b>System Activity / Logs</b><p>View system activities and access logs.</p></div><i class="go" data-i="arrow"></i></a>
+                <a class="tl" href="admin-settings.html"><span class="ic sl"><i data-i="gear"></i></span><div><b>System Settings</b><p>Manage academic-year classifications and system settings.</p></div><i class="go" data-i="arrow"></i></a>
+              </div>
+            </div>
+            <div class="card">
+              <div class="qh"><i data-i="bolt"></i>Quick Actions</div>
+              <a class="qr" href="admin-users.html?add=1"><i data-i="userPlus"></i>Add User<i class="cv" data-i="chevR"></i></a>
+              <a class="qr" href="admin-email-management.html?add=1"><i data-i="mail"></i>Add Authorized Email<i class="cv" data-i="chevR"></i></a>
+              <a class="qr" href="admin-role-access.html"><i data-i="shield"></i>Manage Roles<i class="cv" data-i="chevR"></i></a>
+              <a class="qr" href="admin-categories-tags.html?add=1"><i data-i="tag"></i>Add Category / Tag<i class="cv" data-i="chevR"></i></a>
+              <a class="qr" href="admin-activity-logs.html"><i data-i="clock"></i>View Logs<i class="cv" data-i="chevR"></i></a>
+              <a class="qr" href="admin-settings.html"><i data-i="gear"></i>System Settings<i class="cv" data-i="chevR"></i></a>
+            </div>
+          </section>
+          <section class="bt">
+            <div class="card">
+              <div class="ph2">
+                <h2><i data-i="users"></i>Recent User Accounts</h2>
+                <a href="admin-users.html">View All</a>
+              </div>
+              <div class="tw">
+                <table>
+                  <thead>
+                    <tr><th>Name</th><th>CMU-CCS Email</th><th>Role</th><th>Status</th><th>Date Created</th></tr>
+                  </thead>
+                  <tbody id="ru"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ph2">
+                <h2><i data-i="clock"></i>Recent System Activity</h2>
+                <a href="admin-activity-logs.html">View All</a>
+              </div>
+              <div id="ra"></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+      function init() {
+        $("#wl").textContent = `Welcome, ${titleCase(U.name)}!`;
+        const stats = [["Total Users", "248", "users", "t1", "+12"], ["Authorized CMU-CCS Emails", "186", "mail", "t2", "+8"], ["Student Accounts", "162", "cap", "t3", "+10"], ["Faculty Accounts", "64", "users", "t4", "+4"], ["System Activity / Logs", "1,248", "clock", "t5", "+36"]];
+        $("#st").innerHTML = stats.map(s => `<div class="sc ${s[3]}"><span class="ic"><i data-i="${s[2]}"></i></span><div><small>${s[0]}</small><b>${s[1]}</b><em>↗ ${s[4]} this month</em></div></div>`).join("");
+        const users = [["Juan Dela Cruz", "juan.delacruz@cmu-ccs.edu.ph", "Student", "Aug 27, 2025"], ["Maria Santos", "maria.santos@cmu-ccs.edu.ph", "Faculty", "Aug 26, 2025"], ["Carlos Garcia", "carlos.garcia@cmu-ccs.edu.ph", "Student", "Aug 25, 2025"], ["Ana Reyes", "ana.reyes@cmu-ccs.edu.ph", "Faculty", "Aug 24, 2025"], ["Pedro Lim", "pedro.lim@cmu-ccs.edu.ph", "Student", "Aug 22, 2025"]];
+        $("#ru").innerHTML = users.map(u => `<tr><td>${u[0]}</td><td>${u[1]}</td><td>${u[2]}</td><td><span class="pill">Active</span></td><td>${u[3]}</td></tr>`).join("");
+        const acts = [["userPlus", "g", "User account created", "juan.delacruz@cmu-ccs.edu.ph", "10:22 AM"], ["mail", "", "Authorized email added", "test@cmu-ccs.edu.ph", "09:48 AM"], ["shield", "pu", "User role updated", "Maria Santos → Faculty", "09:15 AM"], ["tag", "or", "Category added", "Machine Learning", "08:50 AM"], ["gear", "sl", "System settings updated", "Academic year 2025-2026", "08:30 AM"]];
+        $("#ra").innerHTML = acts.map(a => `<div class="al"><span class="ic ${a[1]}"><i data-i="${a[0]}"></i></span><div><b>${a[2]}</b><small>${a[3]}</small></div><em>${a[4]}</em></div>`).join("");
+
+      }
+    </script>
+  </body>
+</html>

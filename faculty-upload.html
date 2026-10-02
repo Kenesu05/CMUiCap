@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Upload New Capstone | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="faculty-upload.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <h1>Upload New Capstone</h1>
+          <p class="sub">Submit a capstone record with its abstract and Chapters 1 to 5 to the repository.</p>
+          <form id="uf" class="card">
+            <h2>Capstone Details</h2>
+            <div class="fg">
+              <label>Project title<input id="ti" placeholder="e.g. Online Enrollment System" required="" type="text"/></label>
+              <label>Authors<input id="au" placeholder="Surname, First name; separate authors with commas" required="" type="text"/></label>
+              <label>Academic year<select id="yr"></select></label>
+              <label>Program<select id="pg"><option>BS Information Technology</option><option>BS Information Systems</option><option>BS Computer Science</option></select></label>
+              <label>Category<select id="ct"></select></label>
+              <label>Adviser<input id="ad" placeholder="Adviser name" required="" type="text"/></label>
+              <label>Technologies<input id="te" placeholder="Comma-separated, e.g. PHP, MySQL" required="" type="text"/></label>
+              <label>Keywords<input id="ke" placeholder="Comma-separated" required="" type="text"/></label>
+            </div>
+            <label style="margin-top:14px;display:grid;gap:5px;font-size:13px;font-weight:600">Abstract<textarea id="ab" placeholder="Write the abstract" required=""></textarea></label>
+            <h2 style="margin-top:18px">Chapters 1 to 5</h2>
+            <div class="chs">
+              <label>Chapter 1: Introduction<textarea id="c1" placeholder="Write the chapter content" required=""></textarea></label>
+              <label>Chapter 2: Review of Related Literature<textarea id="c2" placeholder="Write the chapter content" required=""></textarea></label>
+              <label>Chapter 3: Methodology<textarea id="c3" placeholder="Write the chapter content" required=""></textarea></label>
+              <label>Chapter 4: Results and Discussion<textarea id="c4" placeholder="Write the chapter content" required=""></textarea></label>
+              <label>Chapter 5: Summary, Conclusions and Recommendations<textarea id="c5" placeholder="Write the chapter content" required=""></textarea></label>
+            </div>
+            <div class="tbar">
+              <button class="btn ghost" id="sample" type="button">Use sample data</button>
+              <span class="sp"></span>
+              <a class="btn ghost" href="faculty-uploads.html">Cancel</a>
+              <button class="btn" type="submit">Submit Capstone</button>
+            </div>
+          </form>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="faculty.js"></script>
+    <script>
+      function init() {
+        const cats = ["Web Development", "Mobile Application", "Database", "IoT", "Data Analytics", "Healthcare", "Education", "Finance", "Gaming", "Cybersecurity", "Other"];
+        $("#ct").innerHTML = cats.map(c => `<option>${c}</option>`).join("");
+        $("#yr").innerHTML = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019].map(y => `<option>${y}</option>`).join("");
+        $("#sample").onclick = () => {
+          $("#ti").value = "Barangay Document Request System";
+          $("#au").value = "Dela Peña, Ana; Ramos, Ben";
+          $("#ad").value = titleCase(U.name);
+          $("#te").value = "PHP, MySQL, JavaScript";
+          $("#ke").value = "barangay, documents, requests";
+          $("#ab").value = "A web system that lets residents request barangay documents online and track their status.";
+          ["Residents wait in long lines to request documents. This study builds an online request system. The system aims to shorten processing time.", "Reviewed studies show that online request portals reduce waiting time and paperwork.", "The team used the Agile model with PHP and MySQL and tested the system with residents and barangay staff.", "Respondents rated the system 4.4 out of 5, and processing time fell from two days to four hours.", "The system met its objectives. The authors recommend adding SMS notifications."].forEach((t, i) => $("#c" + (i + 1)).value = t);
+
+        };
+        $("#uf").onsubmit = e => {
+          e.preventDefault();
+          const v = id => escapeHTML($("#" + id).value.trim());
+          const split = s => s.split(",").map(x => x.trim()).filter(Boolean);
+          const project = {id: Date.now(), title: v("ti"), authors: v("au"), year: +$("#yr").value, program: $("#pg").value, category: $("#ct").value, abstract: v("ab"), technologies: split(v("te")), keywords: split(v("ke")), adviser: v("ad"), status: "Ongoing", verificationStatus: "Pending", chapters: [1, 2, 3, 4, 5].map(n => v("c" + n)), uploadedBy: "faculty"};
+          UPLOADS.push(project);
+          PROJECTS.push(project);
+          saveUploads();
+          toast("Capstone submitted for review.");
+          setTimeout(() => location.href = "faculty-uploads.html", 900);
+
+        };
+
+      }
+    </script>
+  </body>
+</html>

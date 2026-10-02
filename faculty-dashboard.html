@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Faculty Dashboard | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="faculty-dashboard.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <div class="fh">
+            <span class="fic"><i data-i="cap"></i></span>
+            <div>
+              <small>Welcome back,</small>
+              <h1 id="wl">Faculty</h1>
+            </div>
+          </div>
+          <p class="sub">Manage your capstones, verify projects, and use AI-powered similarity detection.</p>
+          <section class="fcards">
+            <a class="fcd c2" href="faculty-similarity.html"><span class="ic"><i data-i="fileSearch"></i></span><b>AI-Assisted Title and Abstract Similarity Detection</b><p>Check similarity percentage, level, and related capstone projects.</p><i data-i="arrow"></i></a>
+            <a class="fcd c3" href="faculty-upload.html"><span class="ic"><i data-i="uploadCloud"></i></span><b>Upload New Capstone</b><p>Submit a capstone record with its chapters to the repository.</p><i data-i="arrow"></i></a>
+            <a class="fcd c4" href="faculty-uploads.html"><span class="ic"><i data-i="folder"></i></span><b>My Uploaded Capstones</b><p>View and manage your uploaded capstone records.</p><i data-i="arrow"></i></a>
+            <a class="fcd c5" href="faculty-profile.html"><span class="ic"><i data-i="user"></i></span><b>My Profile</b><p>Update your profile and account settings.</p><i data-i="arrow"></i></a>
+          </section>
+          <section class="fgrid">
+            <div class="card">
+              <div class="ph2">
+                <h2><i data-i="folder"></i>My Uploaded Capstones</h2>
+                <a href="faculty-uploads.html">View All</a>
+              </div>
+              <div class="tw">
+                <table>
+                  <thead>
+                    <tr><th>Title</th><th>Authors</th><th>Academic Year</th><th>Status</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="rows"></tbody>
+                </table>
+              </div>
+              <div class="pg">
+                <span id="cnt"></span>
+                <div>
+                  <button class="pb" id="pp">‹</button>
+                  <button class="pb on" id="pc">1</button>
+                  <button class="pb" id="pn">›</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="card">
+                <div class="ph2">
+                  <h2><i data-i="chart"></i>Quick Stats</h2>
+                </div>
+                <div class="qs" id="qs"></div>
+              </div>
+              <div class="card dots">
+                <div class="ph2">
+                  <h2><i data-i="clock"></i>Recent Activity</h2>
+                  <a href="faculty-verification.html">View All</a>
+                </div>
+                <p>You uploaded a capstone record<em>Aug 25, 04:32 PM</em></p>
+                <p>Similarity check completed<em>Aug 24, 11:20 AM</em></p>
+                <p>A capstone was authorized<em>Aug 22, 03:15 PM</em></p>
+                <p>You updated your profile<em>Aug 20, 09:42 AM</em></p>
+              </div>
+            </div>
+          </section>
+          <div class="ft"><span>CMUiCAP | Capstone Repository and Topic Recommendation System</span><span>CMU - CCS</span></div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="faculty.js"></script>
+    <script>
+      function init() {
+        $("#wl").textContent = titleCase(U.name);
+        const pageSize = 5;
+        let page = 1;
+        const mine = () => facultyProjects();
+        const pages = () => Math.max(1, Math.ceil(mine().length / pageSize));
+        const authorized = p => p.verificationStatus === "Verified";
+        const code = (p, i) => `${p.program.includes("Computer Science") ? "CS" : p.program.includes("Systems") ? "IS" : "IT"}-${p.year - 2}-${String(i + 1).padStart(3, "0")}`;
+        function tiles() {
+          const t = [["Total Capstones Uploaded", mine().length, "fileSearch", "faculty-uploads"], ["Capstones Authorized", mine().filter(authorized).length, "uploadCloud", "faculty-uploads"], ["My Uploaded Capstones", PROJECTS.filter(p => p.uploadedBy === "faculty").length, "folder", "faculty-uploads"], ["Active Students", "3", "cap", "faculty-profile"]];
+          $("#qs").innerHTML = t.map(x => `<a class="qt" href="${x[3]}.html"><span class="ic"><i data-i="${x[2]}"></i></span><div><b>${x[1]}</b><small>${x[0]}</small></div></a>`).join("");
+
+        }
+        function draw() {
+          const list = mine();
+          page = Math.min(page, pages());
+          const start = (page - 1) * pageSize;
+          $("#rows").innerHTML = list.slice(start, start + pageSize).map((p, i) => `<tr><td><b>${p.title}</b><small>${p.program.replace("BS ", "")}</small></td><td>${p.authors.split(",")[0]}<small>(${code(p, start + i)})</small></td><td>AY ${p.year - 1} - ${p.year}</td><td><span class="pill ${authorized(p) ? "" : "w"}">${authorized(p) ? "Authorized" : "Pending Review"}</span></td><td><button class="ib" data-a="view" data-id="${p.id}" aria-label="View details"><i data-i="eye"></i></button><button class="ib" data-a="more" data-id="${p.id}" aria-label="More actions"><i data-i="more"></i></button></td></tr>`).join("");
+          $("#cnt").textContent = `Showing ${start + 1} - ${Math.min(start + pageSize, list.length)} of ${list.length} capstones`;
+          $("#pc").textContent = page;
+          $("#pp").disabled = page <= 1;
+          $("#pn").disabled = page >= pages();
+          tiles();
+
+        }
+        $("#pp").onclick = () => {
+          page--;
+          draw();
+
+        };
+        $("#pn").onclick = () => {
+          page++;
+          draw();
+
+        };
+        $("#rows").onclick = e => {
+          const b = e.target.closest("button[data-a]");
+          if (!b) return;
+          const p = PROJECTS.find(x => x.id === +b.dataset.id);
+          if (b.dataset.a === "view") {
+            pd(p.id);
+            return;
+
+          }
+          modal(esc(p.title), `<p class="sub">Choose an action for this capstone record.</p><div class="set"><span>View details and Chapters 1 to 5</span><button class="mini" id="m1">View</button></div><div class="set"><span>Mark as ${authorized(p) ? "Pending Review" : "Authorized"}</span><button class="mini" id="m2">Apply</button></div>`);
+          $("#m1").onclick = () => pd(p.id);
+          $("#m2").onclick = () => {
+            p.verificationStatus = authorized(p) ? "Pending" : "Verified";
+            saveUploads();
+            $("#mdl").classList.remove("open");
+            draw();
+            toast("Status updated.");
+
+          };
+
+        };
+        draw();
+
+      }
+    </script>
+  </body>
+</html>

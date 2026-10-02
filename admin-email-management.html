@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>CMU-CCS Email Management | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="admin-email-management.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <a class="bk" href="admin-dashboard.html">← Back to Dashboard</a>
+          <h1>CMU-CCS Email Management</h1>
+          <p class="sub">Manage authorized CMU-CCS email accounts and control access.</p>
+          <section class="stats" id="st"></section>
+          <div class="tbar">
+            <input aria-label="Search" id="q" placeholder="Search by name or email" type="search"/>
+            <select id="f1"><option value="">All statuses</option><option>Active</option><option>Inactive</option><option>Pending</option></select>
+            <select id="f2"><option value="">All roles</option><option>Student</option><option>Faculty</option></select>
+            <button class="btn ghost" id="exp">Export</button>
+            <button class="btn" id="add">+ Add Authorized Email</button>
+          </div>
+          <div class="card">
+            <div id="t"></div>
+            <p class="sub" id="cnt"></p>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+      function init() {
+        const D = USERS.map(u => ({...u}));
+        const st = () => stats("#st", [["Authorized Emails", D.length, "✉", "s1"], ["Active", D.filter(u => u.status == "Active").length, "✔", "s2"], ["Pending", D.filter(u => u.status == "Pending").length, "⏳", "s6"], ["Inactive", D.filter(u => u.status == "Inactive").length, "✖", "s3"]]);
+        st();
+        const form = u => fld("Name", "fn", u.name) + fld("Email", "fe", u.email, "email") + sel("Role", "fr", ["Student", "Faculty"], u.role);
+        const T = dt({el: "#t", q: "#q", f: {"#f1": "status", "#f2": "role"}, count: "#cnt", data: () => D, cols: [["Email", r => esc(r.email)], ["Name", r => `<b>${esc(r.name)}</b>`], ["Role", r => r.role], ["Status", r => bd(r.status)], ["Date Added", r => r.added], ["Last Activity", r => r.last]], act: [["edit", "Edit"], ["tog", r => r.status == "Active" ? "Deactivate" : "Activate"]], on: {edit: u => modal("Edit email", form(u), () => {
+          u.name = $("#fn").value;
+          u.email = $("#fe").value;
+          u.role = $("#fr").value;
+          T.draw();
+          toast("Email record updated.")
+        }), tog: u => {
+          u.status = u.status == "Active" ? "Inactive" : "Active";
+          st();
+          toast(u.email + " is now " + u.status + ".")
+        }
+        }});
+        $("#add").onclick = () => modal("Add authorized email", form({name: "", email: "", role: "Student"}), () => {
+          if (!$("#fn").value || !$("#fe").value) {
+            toast("Enter a name and email.");
+            return false
+          }
+          D.unshift({id: Date.now(), name: $("#fn").value, email: $("#fe").value, role: $("#fr").value, status: "Active", added: "Today", last: "—"});
+          T.draw();
+          st();
+          toast("Authorized email added.")
+        }, "Add email");
+        $("#exp").onclick = () => {
+          csv("authorized-emails-demo.csv", "Email,Name,Role,Status,Date Added,Last Activity", D.map(u => [u.email, u.name, u.role, u.status, u.added, u.last]));
+          toast("Email list exported.")
+        }
+
+      }
+    </script>
+  </body>
+</html>

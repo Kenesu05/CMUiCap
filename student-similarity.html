@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Title &amp; Abstract Similarity Detection | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="student-similarity.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <header class="top" id="top"></header>
+    <main>
+      <section class="banner">
+        <span class="bi">📄</span>
+        <div>
+          <h1>Title &amp; Abstract Similarity Detection</h1>
+          <p>Compare your proposed title and abstract with existing CMU-CCS capstone projects.</p>
+        </div>
+      </section>
+      <div class="lay">
+        <section class="card">
+          <h2 class="ht"><span class="n">1</span> Enter Your Project Details</h2>
+          <label>Project Title *<textarea id="ti" maxlength="200" rows="3"></textarea><small id="c1">0/200</small></label>
+          <label>Project Abstract *<textarea id="ab" maxlength="1000" rows="7"></textarea><small id="c2">0/1000</small></label>
+          <h2 class="ht"><span class="n">2</span> Detection Settings</h2>
+          <label>Similarity threshold: <b id="tv">50%</b><input id="th" max="95" min="30" type="range" value="50"/></label>
+          <button class="btn full" id="go">🔍 Check Similarity</button>
+        </section>
+        <section>
+          <div class="card">
+            <h2>🏆 Top 5 Most Similar Projects</h2>
+            <div id="res">
+              <p class="empty">Enter your title and abstract, then select Check Similarity.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <div class="modal" id="modal"></div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="student.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const t = $("#ti"), a = $("#ab");
+        t.oninput = a.oninput = () => {
+          $("#c1").textContent = t.value.length + "/200";
+          $("#c2").textContent = a.value.length + "/1000"
+        };
+        $("#th").oninput = () => $("#tv").textContent = $("#th").value + "%";
+        $("#go").onclick = () => {
+          if (!t.value.trim() || !a.value.trim()) {
+            toast("Enter a project title and abstract first.");
+            return
+          }
+          const th = +$("#th").value, R = simScore(t.value, a.value).filter(r => r.score >= th).slice(0, 5);
+          log("Performed Similarity Check", t.value.slice(0, 60));
+          $("#res").innerHTML = R.length ? R.map((r, i) => `<div class="rs"><span class="rk">${i+1}</span><div class="ring" style="--p:${r.score}"><b>${r.score}%</b></div><div class="ri"><h3>${r.p.title}</h3><div class="m">📅 ${r.p.year} · ${r.p.category} · 👤 ${r.p.authors}</div><p>${r.p.abstract.slice(0,100)}…</p></div><button class="out" onclick="showDetails(${r.p.id})">View Details →</button></div>`).join("") : `<p class="empty">No projects reach ${th}% similarity. Lower the threshold to see more results.</p>`
+        }
+
+      });
+    </script>
+  </body>
+</html>

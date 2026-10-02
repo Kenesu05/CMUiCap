@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Repository Verification | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="faculty-verification.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <h1>Repository Verification</h1>
+          <p class="sub">Verify defended and approved capstone projects for the repository.</p>
+          <div class="tbar">
+            <input aria-label="Search" id="q" placeholder="Search by title or group" type="search"/>
+            <select id="f1"><option value="">All verification statuses</option><option>Verified</option><option>Pending</option></select>
+          </div>
+          <div class="card">
+            <div id="t"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="faculty.js"></script>
+    <script>
+      function init() {
+        const D = PROJECTS.slice(0, 8).map((p, i) => ({id: p.id, title: p.title, group: p.authors, defense: i % 4 == 3 ? "Scheduled" : "Completed", approval: i % 4 == 3 ? "Pending" : "Approved", lib: i % 3 == 2 ? "Pending" : "Submitted", ver: p.verificationStatus}));
+        const T = dt({el: "#t", q: "#q", f: {"#f1": "ver"}, data: () => D, cols: [["Project title", r => `<b>${esc(r.title)}</b>`], ["Student / group", r => r.group], ["Defense", r => bd(r.defense === "Completed" ? "Done" : r.defense)], ["Approval", r => bd(r.approval)], ["Library submission", r => bd(r.lib)], ["Verification", r => bd(r.ver)]], act: [["v", "View"], ["ver", "Verify Project"], ["up", "Upload Record"]], on: {v: r => pd(r.id), ver: r => {
+          if (r.approval !== "Approved") {
+            toast("This project needs approval before it can be verified.");
+            return
+          }
+          r.ver = "Verified";
+          PROJECTS.find(p => p.id === r.id).verificationStatus = "Verified";
+          toast("Project verified.")
+        }, up: r => modal("Upload record", `<p>Choose a file to attach to <b>${esc(r.title)}</b>.</p><label>Record file<input type="file"></label>`, () => {
+          r.lib = "Submitted";
+          T.draw();
+          toast("Record uploaded.")
+        }, "Upload")}})
+      }
+    </script>
+  </body>
+</html>

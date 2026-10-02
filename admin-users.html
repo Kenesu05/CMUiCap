@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>User Management | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="admin-users.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <a class="bk" href="admin-dashboard.html">← Back to Dashboard</a>
+          <h1>User Management</h1>
+          <p class="sub">View, manage, activate, and deactivate user accounts.</p>
+          <section class="stats" id="st"></section>
+          <div class="tbar">
+            <input aria-label="Search" id="q" placeholder="Search by name or email" type="search"/>
+            <select id="f1"><option value="">All roles</option><option>Student</option><option>Faculty</option><option>Admin</option></select>
+            <select id="f2"><option value="">All statuses</option><option>Active</option><option>Inactive</option><option>Pending</option></select>
+            <button class="btn" id="add">+ Add User</button>
+          </div>
+          <div class="card">
+            <div id="t"></div>
+            <p class="sub" id="cnt"></p>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+      function init() {
+        const D = [{id: 0, name: "Admin", email: "admin@cityofmalabonuniversity.edu.ph", role: "Admin", status: "Active", last: "Aug 27, 2025 10:12 AM"}, ...USERS];
+        const st = () => stats("#st", [["Total Users", D.length, "👥", "s1"], ["Student Accounts", D.filter(u => u.role == "Student").length, "🎓", "s2"], ["Faculty Accounts", D.filter(u => u.role == "Faculty").length, "👥", "s3"], ["Admin Accounts", D.filter(u => u.role == "Admin").length, "🛡", "s6"]]);
+        st();
+        const form = u => fld("Full name", "fn", u.name) + fld("CMU-CCS email", "fe", u.email, "email") + sel("Role", "fr", ["Student", "Faculty", "Admin"], u.role) + sel("Status", "fs", ["Active", "Inactive", "Pending"], u.status);
+        const T = dt({el: "#t", q: "#q", f: {"#f1": "role", "#f2": "status"}, count: "#cnt", data: () => D, cols: [["Name", r => `<b>${esc(r.name)}</b>`], ["Email", r => esc(r.email)], ["Role", r => r.role], ["Status", r => bd(r.status)], ["Last login", r => r.last]], act: [["edit", "Edit User"], ["reset", "Reset Password"], ["tog", r => r.status == "Active" ? "Deactivate" : "Activate"], ["acc", "Manage Access"]], on: {edit: u => modal("Edit user", form(u), () => {
+          u.name = $("#fn").value;
+          u.email = $("#fe").value;
+          u.role = $("#fr").value;
+          u.status = $("#fs").value;
+          T.draw();
+          st();
+          toast("User updated.")
+        }), reset: u => toast("Password reset sent for " + u.name + "."), tog: u => {
+          u.status = u.status == "Active" ? "Inactive" : "Active";
+          st();
+          toast(u.name + " is now " + u.status + ".")
+        }, acc: () => location.href = "admin-role-access.html"}});
+        $("#add").onclick = () => modal("Add user", form({name: "", email: "", role: "Student", status: "Active"}), () => {
+          if (!$("#fn").value || !$("#fe").value) {
+            toast("Enter a name and email to add a user.");
+            return false
+          }
+          D.unshift({id: Date.now(), name: $("#fn").value, email: $("#fe").value, role: $("#fr").value, status: $("#fs").value, last: "—"});
+          T.draw();
+          st();
+          toast("User added.")
+        }, "Add user")
+      }
+    </script>
+  </body>
+</html>

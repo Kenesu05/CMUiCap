@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Academic Year Settings | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="admin-academic-years.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <a class="bk" href="admin-settings.html">← Back to System Settings</a>
+          <h1>Academic Year Settings</h1>
+          <p class="sub">Manage the academic year, semester, and related settings.</p>
+          <div class="note" id="cur"></div>
+          <div class="tbar">
+            <button class="btn" id="add">+ Add Academic Year</button>
+          </div>
+          <div class="card">
+            <div id="t"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+      function init() {
+        const cur = () => {
+          const c = YEARS.find(y => y.status == "Current");
+          $("#cur").innerHTML = c ? `<b>Current academic year: ${c.year}</b> · ${c.sem} · ${c.start} – ${c.end}` : "No current academic year set. Use Set as Current on a row."
+        };
+        const f = y => fld("Academic year", "y", y.year) + sel("Semester", "s", ["First Semester", "Second Semester", "Summer Term"], y.sem) + fld("Start date", "a", y.start) + fld("End date", "e", y.end);
+        const T = dt({el: "#t", data: () => YEARS, cols: [["Academic year", r => `<b>${r.year}</b>`], ["Semester", r => r.sem], ["Start date", r => r.start], ["End date", r => r.end], ["Status", r => bd(r.status)]], act: [["edit", "Edit"], ["cur", "Set as Current"], ["del", "Delete"]], on: {edit: y => modal("Edit academic year", f(y), () => {
+          y.year = $("#y").value;
+          y.sem = $("#s").value;
+          y.start = $("#a").value;
+          y.end = $("#e").value;
+          cur();
+          T.draw();
+          toast("Academic year updated.")
+        }), cur: y => {
+          YEARS.forEach(x => x.status = "Inactive");
+          y.status = "Current";
+          cur();
+          toast(y.year + " is now the current academic year.")
+        }, del: y => modal("Delete academic year?", `<p>Delete <b>${y.year}</b>?</p>`, () => {
+          YEARS.splice(YEARS.indexOf(y), 1);
+          cur();
+          T.draw();
+          toast("Academic year deleted.")
+        }, "Delete")}});
+        cur();
+        $("#add").onclick = () => modal("Add academic year", f({year: "2026–2027", sem: "First Semester", start: "", end: ""}), () => {
+          YEARS.unshift({id: Date.now(), year: $("#y").value, sem: $("#s").value, start: $("#a").value, end: $("#e").value, status: "Inactive"});
+          T.draw();
+          toast("Academic year added.")
+        }, "Add")
+      }
+    </script>
+  </body>
+</html>

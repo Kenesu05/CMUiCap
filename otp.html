@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Verify | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="otp.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="card box">
+        <img alt="CMUiCAP logo" class="lg" src="cmuicap-logo.png"/>
+        <h1>Verify Your Account</h1>
+        <p class="sub">Enter the 6-digit code to continue.</p>
+        <div class="boxes" id="boxes"></div>
+        <p id="msg" role="alert"></p>
+        <button class="btn full" id="v">Verify</button>
+        <p class="re"><button class="link" disabled="" id="re">Resend OTP</button> <span id="t"></span></p>
+        <p class="demo">Prototype Only — OTP verification is simulated and does not send a real email.</p>
+      </section>
+    </main>
+    <script src="otp.js"></script>
+  </body>
+</html>

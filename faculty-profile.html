@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Profile | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="faculty-profile.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <h1>Profile</h1>
+          <p class="sub">Your account details.</p>
+          <div class="card">
+            <div id="pf"></div>
+          </div>
+          <div class="tbar" style="margin-top:16px">
+            <button class="btn ghost" id="lo">Log out</button>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="faculty.js"></script>
+    <script>
+      function init() {
+        $("#pf").innerHTML = [["Faculty name", U.name], ["Email", U.email], ["Role", "Faculty"], ["Department", U.department], ["Account status", bd(U.status)]].map(r => `<div class="set"><span>${r[0]}</span><b>${r[1]}</b></div>`).join("");
+        $("#lo").onclick = () => {
+          localStorage.removeItem("cmuicapCurrentUser");
+          location.href = "index.html"
+        }
+
+      }
+    </script>
+  </body>
+</html>

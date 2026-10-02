@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Email Settings | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="admin-email-settings.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <a class="bk" href="admin-settings.html">← Back to System Settings</a>
+          <h1>Email Settings</h1>
+          <p class="sub">Configure email integration and notification settings.</p>
+          <section class="card mb">
+            <h2>SMTP Configuration</h2>
+            <div class="fg">
+              <label>SMTP server<input value="smtp.cmu-ccs.edu.ph"/></label>
+              <label>SMTP port<input value="587"/></label>
+              <label>Sender email<input value="noreply@cmu-ccs.edu.ph"/></label>
+            </div>
+            <div class="row" style="justify-content:flex-start;margin-top:14px">
+              <button class="btn" id="save">Save changes</button>
+            </div>
+          </section>
+          <div class="cols">
+            <section class="card">
+              <h2>Email Templates</h2>
+              <div id="t"></div>
+            </section>
+            <section class="card">
+              <h2>Notification Preferences</h2>
+              <div class="set"><span>Account activation emails<small>When a new account is created</small></span><span id="n1"></span></div>
+              <div class="set"><span>Password reset emails<small>When a user requests a reset</small></span><span id="n2"></span></div>
+              <div class="set"><span>Topic review updates<small>When a proposal is approved or needs revision</small></span><span id="n3"></span></div>
+              <div class="set"><span>Maintenance notices<small>Scheduled downtime</small></span><span id="n4"></span></div>
+              <h2 style="margin-top:20px">Send Test Email</h2>
+              <div class="tbar">
+                <input aria-label="Recipient" id="to" placeholder="Recipient email address" type="search"/>
+                <button class="btn" id="test">Send Test Email</button>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+      function init() {
+        ["n1", "n2", "n3", "n4"].forEach(i => $("#" + i).innerHTML = sw(true));
+        const TP = [{id: 1, event: "Welcome Email", subject: "Welcome to CMUiCAP!", status: "Active"}, {id: 2, event: "Password Reset", subject: "Reset your password", status: "Active"}, {id: 3, event: "Topic Approved", subject: "Your topic was approved", status: "Active"}, {id: 4, event: "Maintenance Notice", subject: "Scheduled maintenance", status: "Inactive"}];
+        const T = dt({el: "#t", data: () => TP, cols: [["Event", r => `<b>${r.event}</b>`], ["Subject", r => r.subject], ["Status", r => bd(r.status)]], act: [["prev", "Preview"], ["edit", "Edit"]], on: {prev: t => modal(t.event, `<p><b>${t.subject}</b></p><p>Hello (name), this is a preview of the template.</p>`), edit: t => modal("Edit template", fld("Subject", "s", t.subject), () => {
+          t.subject = $("#s").value;
+          T.draw();
+          toast("Template updated.")
+        })}});
+        $("#test").onclick = () => toast("Test email sent successfully.");
+        $("#save").onclick = () => toast("Email settings saved.")
+      }
+    </script>
+  </body>
+</html>

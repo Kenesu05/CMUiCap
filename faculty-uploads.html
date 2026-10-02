@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>My Uploaded Capstones | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="faculty-uploads.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <h1>My Uploaded Capstones</h1>
+          <p class="sub">View and manage the capstone records you uploaded.</p>
+          <div class="tbar">
+            <input aria-label="Search" id="q" placeholder="Search by title, author, or keyword" type="search"/>
+            <select id="f1"><option value="">All statuses</option><option value="Verified">Authorized</option><option value="Pending">Pending Review</option></select>
+            <a class="btn" href="faculty-upload.html">+ Upload New Capstone</a>
+          </div>
+          <div class="card">
+            <div id="t"></div>
+            <p class="sub" id="cnt"></p>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="faculty.js"></script>
+    <script>
+      function init() {
+        const T = dt({el: "#t", q: "#q", f: {"#f1": "verificationStatus"}, count: "#cnt", data: facultyProjects, cols: [["Title", r => `<b>${r.title}</b><br><small>${r.program}</small>`], ["Authors", r => r.authors], ["Academic year", r => `AY ${r.year - 1} - ${r.year}`], ["Status", r => `<span class="pill ${r.verificationStatus === "Verified" ? "" : "w"}">${r.verificationStatus === "Verified" ? "Authorized" : "Pending Review"}</span>`]], act: [["view", "View"], ["tog", r => r.verificationStatus === "Verified" ? "Mark Pending" : "Authorize"], ["del", "Delete"]], on: {view: r => pd(r.id), tog: r => {
+          r.verificationStatus = r.verificationStatus === "Verified" ? "Pending" : "Verified";
+          r.status = r.verificationStatus === "Verified" ? "Completed" : "Ongoing";
+          saveUploads();
+          toast("Status updated.");
+
+        }, del: r => {
+          if (!r.uploadedBy) {
+            toast("Sample records cannot be deleted. Delete a capstone you uploaded instead.");
+            return;
+
+          }
+          modal("Delete capstone?", `<p>Delete <b>${r.title}</b>? This cannot be undone.</p>`, () => {
+            UPLOADS.splice(UPLOADS.indexOf(r), 1);
+            PROJECTS.splice(PROJECTS.indexOf(r), 1);
+            saveUploads();
+            T.draw();
+            toast("Capstone deleted.");
+
+          }, "Delete");
+
+        }
+        }});
+
+      }
+    </script>
+  </body>
+</html>

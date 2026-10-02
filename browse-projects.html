@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Browse Projects | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="browse-projects.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <header class="top" id="top"></header>
+    <main>
+      <h1>Browse Projects</h1>
+      <p class="sub">Search the CMU-CCS capstone repository.</p>
+      <div class="bar">
+        <input aria-label="Search" id="q" placeholder="Search title, author, keyword, technology" type="search"/>
+        <select aria-label="Years" id="f-year"><option value="">All Years</option></select>
+        <select aria-label="Programs" id="f-program"><option value="">All Programs</option></select>
+        <select aria-label="Categories" id="f-category"><option value="">All Categories</option></select>
+        <select aria-label="Technologies" id="f-tech"><option value="">All Technologies</option></select>
+        <select aria-label="Statuses" id="f-status"><option value="">All Statuses</option></select>
+      </div>
+      <div class="grid" id="list"></div>
+    </main>
+    <div class="modal" id="modal"></div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="student.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        filters("", PROJECTS);
+        const qp = new URLSearchParams(location.search).get("q");
+        if (qp) document.getElementById("q").value = qp;
+        window.refresh = () => cards("#list", applyFilters(PROJECTS));
+        refresh();
+        document.querySelectorAll(".bar input,.bar select").forEach(e => e.addEventListener("input", () => {
+          refresh();
+          if (e.id === "q" && e.value.length > 2) log("Searched", e.value)
+        }))
+      });
+    </script>
+  </body>
+</html>

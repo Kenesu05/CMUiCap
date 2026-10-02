@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Similarity | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="faculty-similarity.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <h1>Similarity</h1>
+          <p class="sub">Check a proposed title and abstract against existing capstone projects.</p>
+          <p class="note">Similarity results are provided as an additional reference and do not replace academic evaluation or faculty judgment.</p>
+          <div class="cols">
+            <section class="card">
+              <label><b>Proposed title</b><input id="ti" style="width:100%;margin:6px 0 14px"/></label>
+              <label><b>Abstract</b><textarea id="ab" style="margin-top:6px"></textarea></label>
+              <button class="btn" id="go" style="margin-top:14px">Check Similarity</button>
+            </section>
+            <section class="card">
+              <h2>Matching projects</h2>
+              <div id="res">
+                <p class="empty">Enter a title and abstract, then select Check Similarity.</p>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="faculty.js"></script>
+    <script>
+      function init() {
+        $("#go").onclick = () => {
+          if (!$("#ti").value.trim() || !$("#ab").value.trim()) {
+            toast("Enter a title and an abstract first.");
+            return
+          }
+          $("#res").innerHTML = simScore($("#ti").value, $("#ab").value).slice(0, 5).map(r => `<div class="set"><span><b>${esc(r.p.title)}</b><small>${r.p.year} · ${r.p.category} · Matching keywords: ${r.m.slice(0,6).join(", ")||"none"}</small></span><span><span class="pill ${r.score>=75?"r":r.score>=55?"w":""}">${r.score}%</span> <button class="mini" onclick="pd(${r.p.id})">View details</button></span></div>`).join("")
+        }
+
+      }
+    </script>
+  </body>
+</html>

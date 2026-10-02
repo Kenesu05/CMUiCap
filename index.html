@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Login | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="login.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="card login">
+        <img alt="CMUiCAP logo" class="lg" src="cmuicap-logo.png"/>
+        <h1 class="brand">CMUiCAP</h1>
+        <p class="sub">CMU Capstone Project Repository and Topic Recommendation System</p>
+        <form id="f">
+          <label>CMU-CCS email<input autocomplete="username" id="email" required="" type="email"/></label>
+          <label>Password<span class="pw"><input autocomplete="current-password" id="pw" required="" type="password"/><button aria-label="Show password" aria-pressed="false" class="btn ghost" id="eye" type="button">Show</button></span></label>
+          <p class="err" id="err" role="alert"></p>
+          <button class="btn full" type="submit">Log in</button>
+        </form>
+        <p class="demo">Prototype — demo accounts only. Login is simulated in your browser.</p>
+      </section>
+    </main>
+    <script src="data.js"></script>
+    <script src="login.js"></script>
+  </body>
+</html>

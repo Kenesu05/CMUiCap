@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>My Activity | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="my-activity.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <header class="top" id="top"></header>
+    <main>
+      <section class="banner">
+        <span class="bi">🕘</span>
+        <div>
+          <h1>My Activity</h1>
+          <p>View your recent searches, viewed projects, similarity checks, and recommended projects.</p>
+        </div>
+      </section>
+      <div class="lay">
+        <aside class="card">
+          <h2>Activity Filter</h2>
+          <div class="fl" id="fl"></div>
+        </aside>
+        <section class="card">
+          <div class="bar">
+            <input aria-label="Search activity" id="q" placeholder="Search your activity" type="search"/>
+            <select id="so"><option>Most Recent</option><option>Oldest</option></select>
+          </div>
+          <div id="list"></div>
+        </section>
+      </div>
+    </main>
+    <div class="modal" id="modal"></div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="student.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const TY = [["All Activity", null, "🔍", "#e3ecff"], ["Searches", "Searched", "🔎", "#e3ecff"], ["Viewed Projects", "Viewed Project", "👁", "#dcf7e6"], ["Similarity Checks", "Performed Similarity Check", "📄", "#efe7ff"], ["Recommendations", "Viewed Recommendation", "⭐", "#fff1d6"], ["Saved Projects", "Saved Project", "🔖", "#ffe3e8"]];
+        if (!LS("cmuicapActivity", "[]").length) {
+          const d = new Date().toLocaleDateString();
+          localStorage.setItem("cmuicapActivity", JSON.stringify([["Searched", "inventory management"], ["Performed Similarity Check", "Web-Based Inventory Management System"], ["Viewed Project", "Smart Inventory Management System"], ["Viewed Recommendation", "5 related projects were recommended"], ["Saved Project", "College Event Management System"], ["Viewed Project", "Online Student Attendance Monitoring System"]].map((x, i) => ({date: d, time: (2 - Math.floor(i / 3)) + ":" + (50 - i * 7) + " PM", activity: x[0], topic: x[1], status: "Done"}))))
+        }
+        let cur = 0;
+        const draw = () => {
+          const A = LS("cmuicapActivity", "[]"), q = $("#q").value.toLowerCase();
+          $("#fl").innerHTML = TY.map((t, i) => `<button class="${i===cur?"on":""}" onclick="cur=${i};draw()">${t[2]} ${t[0]}<em>${t[1]?A.filter(a=>a.activity===t[1]).length:A.length}</em></button>`).join("");
+          let R = A.filter(a => (!TY[cur][1] || a.activity === TY[cur][1]) && (!q || (a.activity + a.topic).toLowerCase().includes(q)));
+          if ($("#so").value === "Oldest") R = R.slice().reverse();
+          $("#list").innerHTML = R.length ? R.map(a => {
+            const t = TY.find(x => x[1] === a.activity) || TY[0];
+            return `<div class="ar"><span class="ai" style="background:${t[3]}">${t[2]}</span><div><b>${a.activity}</b><small>${a.topic}</small></div><span>${a.date}<br>${a.time}<br>${bdg(a.status)}</span></div>`
+          }).join("") : `<p class="empty">No activity yet. Search or view a project and it will appear here.</p>`
+        };
+        window.draw = draw;
+        window.cur = 0;
+        const bdg = s => `<span class="badge ok">${s}</span>`;
+        $("#q").oninput = $("#so").oninput = draw;
+        draw()
+      });
+    </script>
+  </body>
+</html>

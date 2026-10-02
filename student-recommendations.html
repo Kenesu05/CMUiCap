@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Personalized Related Capstone Project Recommendation | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="student-recommendations.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <header class="top" id="top"></header>
+    <main>
+      <section class="banner">
+        <span class="bi">⭐</span>
+        <div>
+          <h1>Personalized Related Capstone Project Recommendation</h1>
+          <p>Discover existing capstone projects based on your interests and project preferences.</p>
+        </div>
+      </section>
+      <div class="lay">
+        <aside class="card">
+          <h2>👤 Your Interests</h2>
+          <div id="chips"></div>
+          <label>Add interest or keyword<input id="ai" placeholder="Type and press Enter"/></label>
+          <label>Keywords<input id="kw" placeholder="e.g. attendance, inventory"/></label>
+          <h2>Refine Recommendations</h2>
+          <label>Category<select id="f-category"><option value="">All Categories</option></select></label>
+          <label>Year<select id="f-year"><option value="">All Years</option></select></label>
+          <label>Technology<select id="f-tech"><option value="">All Technologies</option></select></label>
+          <button class="btn full" id="go">Get Recommendations</button>
+        </aside>
+        <section>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h2>✦ Recommended Existing Capstone Projects</h2>
+              <select id="sort"><option>Most Relevant</option><option>Newest</option></select>
+            </div>
+            <div id="res">
+              <p class="empty">Select Get Recommendations to see related projects.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <div class="modal" id="modal"></div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="student.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        let INT = ["Web Development", "Database", "IT", "Healthcare"];
+        window.INT = INT;
+        filters("", PROJECTS);
+        window.chips = () => {
+          $("#chips").innerHTML = INT.map((x, i) => `<span class="ch">${x}<button onclick="INT.splice(${i},1);chips()" aria-label="Remove ${x}">×</button></span>`).join("")
+        };
+        chips();
+        $("#ai").onkeydown = e => {
+          if (e.key === "Enter" && e.target.value.trim()) {
+            e.preventDefault();
+            INT.push(e.target.value.trim());
+            e.target.value = "";
+            chips()
+          }
+
+        };
+        function go(auto) {
+          const W = INT.concat($("#kw").value.split(/[ ,]+/)).map(x => x.toLowerCase()).filter(Boolean), g = i => $("#f-" + i).value;
+          let R = PROJECTS.filter(p => (!g("category") || p.category === g("category")) && (!g("year") || p.year == g("year")) && (!g("tech") || p.technologies.includes(g("tech")))).map(p => {
+            const h = (p.title + " " + p.category + " " + p.keywords.join(" ") + " " + p.technologies.join(" ") + " " + p.abstract).toLowerCase();
+            return {p, m: W.filter(x => h.includes(x))}
+          });
+          R.sort($("#sort").value === "Newest" ? (a, b) => b.p.year - a.p.year : (a, b) => b.m.length - a.m.length || b.p.year - a.p.year);
+          R = R.slice(0, 6);
+          if (!auto) log("Viewed Recommendation", R.length + " related projects were recommended");
+          $("#res").innerHTML = R.length ? R.map(r => `<div class="rc"><div class="ri"><h3>${r.p.title}</h3><div class="m">📅 ${r.p.year} · ${r.p.category} · 👤 ${r.p.authors}</div><p>${r.p.abstract.slice(0,100)}…</p><div class="m">Technologies: ${r.p.technologies.join(", ")}</div></div><div class="rt"><div class="m">Related to</div>${(r.m.length?r.m:[r.p.category]).slice(0,3).map(x=>`<span class="tg">${x}</span>`).join("")}<br><button class="out" style="margin-top:8px" onclick="showDetails(${r.p.id})">View Details →</button></div></div>`).join("") : `<p class="empty">No projects match these filters. Reset a filter and try again.</p>`
+        }
+        $("#go").onclick = () => go(false);
+        $("#sort").oninput = () => go(true);
+        go(true)
+      });
+    </script>
+  </body>
+</html>

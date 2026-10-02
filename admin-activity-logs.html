@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>System Activity / Logs | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="admin-activity-logs.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <a class="bk" href="admin-dashboard.html">← Back to Dashboard</a>
+          <h1>System Activity / Logs</h1>
+          <p class="sub">View system activities, user actions, and audit logs.</p>
+          <div class="tbar">
+            <label>From <input id="df" type="date"/></label>
+            <label>To <input id="dto" type="date"/></label>
+            <select id="f1"><option value="">All users</option></select>
+            <select id="f2"><option value="">All actions</option></select>
+            <select id="f3"><option value="">All modules</option></select>
+            <select id="f4"><option value="">All statuses</option><option>Success</option><option>Failed</option></select>
+            <button class="btn" id="exp">Export Logs</button>
+          </div>
+          <div class="card">
+            <div id="t"></div>
+            <p class="sub" id="cnt"></p>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+      function init() {
+        fill("#f1", [...new Set(LOGS.map(l => l.user))]);
+        fill("#f2", ACT);
+        fill("#f3", MOD);
+        dt({el: "#t", f: {"#f1": "user", "#f2": "action", "#f3": "module", "#f4": "status"}, ev: ["#df", "#dto"], pre: r => (!$("#df").value || r.iso >= $("#df").value) && (!$("#dto").value || r.iso <= $("#dto").value), count: "#cnt", data: () => LOGS, cols: [["Date", r => r.date], ["Time", r => r.time], ["User", r => esc(r.user)], ["Action", r => r.action], ["Module", r => r.module], ["Details", r => r.details], ["Status", r => bd(r.status)]], on: {}});
+        $("#exp").onclick = () => {
+          csv("system-logs-demo.csv", "Date,Time,User,Action,Module,Details,Status", LOGS.map(l => [l.date, l.time, l.user, l.action, l.module, l.details, l.status]));
+          toast("Logs exported.")
+        }
+
+      }
+    </script>
+  </body>
+</html>

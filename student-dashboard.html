@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Student Dashboard | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="student-dashboard.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="deco d1"></div>
+    <div class="deco d2"></div>
+    <header class="top" id="top"></header>
+    <main>
+      <section class="hero">
+        <span class="cap"><i data-i="cap"></i></span>
+        <div>
+          <h1 id="wl">Welcome back!</h1>
+          <p>Discover capstone projects, find similar topics, and get personalized recommendations for your research journey.</p>
+        </div>
+      </section>
+      <form class="sbar" action="browse-projects.html">
+        <i data-i="search"></i>
+        <input aria-label="Search projects" name="q" placeholder="Search by title, keyword, author, or technology..."/>
+        <button type="submit">Search</button>
+      </form>
+      <div class="chips">
+        <a href="browse-projects.html?q=Web%20Development"><i data-i="code"></i>Web Development</a>
+        <a href="browse-projects.html?q=Mobile%20Application"><i data-i="phone"></i>Mobile Application</a>
+        <a href="browse-projects.html?q=IoT"><i data-i="cloud"></i>IoT</a>
+        <a href="browse-projects.html?q=Data%20Analytics"><i data-i="chart"></i>Data Analytics</a>
+        <a href="browse-projects.html?q=Healthcare"><i data-i="heart"></i>Healthcare</a>
+      </div>
+      <section class="panel">
+        <div class="ph">
+          <div>
+            <h2><i data-i="sparkle"></i>Featured Capstone Projects</h2>
+            <p>Explore existing CMU-CCS capstone projects based on your interests and project contents.</p>
+          </div>
+          <a class="va" href="archive.html"><i data-i="folder"></i>View Archive<i data-i="arrow"></i></a>
+        </div>
+        <div class="feat" id="feat"></div>
+      </section>
+      <section class="panel">
+        <div class="ph">
+          <div>
+            <h2><i data-i="robot"></i>CAPSTONE PROJECT ANALYSIS</h2>
+            <p>Two functions for analyzing your proposed project and finding related existing projects.</p>
+          </div>
+        </div>
+        <div class="an">
+          <div class="ab">
+            <span class="nb">1</span>
+            <span class="ai"><i data-i="fileSearch"></i></span>
+            <div>
+              <h3>Title &amp; Abstract Similarity Detection</h3>
+              <p>Compare your proposed title and abstract with existing authorized CMU-CCS capstone projects using TF-IDF and Cosine Similarity.</p>
+              <a href="student-similarity.html">Check Similarity<i data-i="arrow"></i></a>
+            </div>
+          </div>
+          <div class="ab p2">
+            <span class="nb">2</span>
+            <span class="ai"><i data-i="list"></i></span>
+            <div>
+              <h3>Personalized Related Project Recommendation</h3>
+              <p>Get recommendations of existing related capstone projects based on your search and project interests.</p>
+              <a href="student-recommendations.html">Get Recommendations<i data-i="arrow"></i></a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div class="modal" id="modal"></div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="student.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        $("#wl").textContent = `Welcome back, ${displayName(U.name).split(" ")[0]}!`;
+        const featured = [[1, "Web Development", "laptop", "blue"], [2, "Mobile Application", "phone", "purple"], [3, "Database", "db", "green"], [4, "Cloud / Healthcare", "cloud", "violet"], [5, "Education", "cap", "red"]];
+        $("#feat").innerHTML = featured.map(f => {
+          const p = PROJECTS.find(x => x.id === f[0]);
+          return `<article class="fc"><div class="ft2"><span class="fi ${f[3]}"><i data-i="${f[2]}"></i></span><span class="pl ${f[3]}">${f[1]}</span></div><h3>${p.title}</h3><div class="m"><span><i data-i="calendar"></i>${p.year}</span><span><i data-i="layers"></i>${p.category}</span></div><p>${p.abstract}</p><div class="au"><i data-i="user"></i>${p.authors}</div><button class="vb" data-id="${p.id}">View Project<i data-i="arrow"></i></button></article>`;
+
+        }).join("");
+        $("#feat").onclick = e => {
+          const b = e.target.closest(".vb");
+          if (b) showDetails(+b.dataset.id);
+
+        };
+
+      });
+    </script>
+  </body>
+</html>

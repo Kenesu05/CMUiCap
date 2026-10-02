@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Repository | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="faculty-repository.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <h1>Repository</h1>
+          <p class="sub">Browse verified capstone projects.</p>
+          <div class="tbar">
+            <input aria-label="Search" id="q" placeholder="Search verified projects" type="search"/>
+            <select id="f1"><option value="">All years</option></select>
+            <select id="f2"><option value="">All categories</option></select>
+            <select id="f3"><option value="">All programs</option></select>
+          </div>
+          <div class="card">
+            <div id="t"></div>
+            <p class="sub" id="cnt"></p>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="faculty.js"></script>
+    <script>
+      function init() {
+        const V = PROJECTS.filter(p => p.verificationStatus === "Verified");
+        const u = k => [...new Set(V.map(p => p[k]))].sort();
+        fill("#f1", u("year"));
+        fill("#f2", u("category"));
+        fill("#f3", u("program"));
+        dt({el: "#t", q: "#q", f: {"#f1": "year", "#f2": "category", "#f3": "program"}, count: "#cnt", data: () => V, cols: [["Title", r => `<b>${esc(r.title)}</b>`], ["Authors", r => r.authors], ["Year", r => r.year], ["Program", r => r.program], ["Category", r => r.category]], act: [["v", "View Details"]], on: {v: r => pd(r.id)}})
+      }
+    </script>
+  </body>
+</html>

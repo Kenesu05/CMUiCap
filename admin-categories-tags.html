@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Categories &amp; Technology Tags | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="admin-categories-tags.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <a class="bk" href="admin-dashboard.html">← Back to Dashboard</a>
+          <h1>Categories &amp; Technology Tags</h1>
+          <p class="sub">Manage categories and technology tags used for search and filtering.</p>
+          <section class="cols">
+            <div class="card">
+              <div class="tbar">
+                <input aria-label="Search categories" id="q1" placeholder="Search categories" type="search"/>
+                <button class="btn" id="a1">+ Add Category</button>
+              </div>
+              <div id="t1"></div>
+            </div>
+            <div class="card">
+              <div class="tbar">
+                <input aria-label="Search tags" id="q2" placeholder="Search technology tags" type="search"/>
+                <button class="btn" id="a2">+ Add Tag</button>
+              </div>
+              <div id="t2"></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+      function init() {
+        const A = (on) => [["edit", "Edit"], ["tog", r => r.status == "Active" ? "Deactivate" : "Activate"], ["del", "Delete"]];
+        const del = (arr, r, t) => modal("Delete " + t + "?", `<p>Delete <b>${esc(r.name)}</b>? This is a demo and only changes this page.</p>`, () => {
+          arr.splice(arr.indexOf(r), 1);
+          T1.draw();
+          T2.draw();
+          toast(t + " deleted.")
+        }, "Delete");
+        const T1 = dt({el: "#t1", q: "#q1", data: () => CATS, cols: [["Category", r => `<b>${esc(r.name)}</b><br><small>${esc(r.desc)}</small>`], ["Status", r => bd(r.status)]], act: A(), on: {edit: r => modal("Edit category", fld("Name", "n", r.name) + fld("Description", "d", r.desc), () => {
+          r.name = $("#n").value;
+          r.desc = $("#d").value;
+          T1.draw();
+          toast("Category updated.")
+        }), tog: r => {
+          r.status = r.status == "Active" ? "Inactive" : "Active"
+        }, del: r => del(CATS, r, "Category")}});
+        const T2 = dt({el: "#t2", q: "#q2", data: () => TAGS, cols: [["Tag", r => `<b>${esc(r.name)}</b><br><small>${esc(r.desc)}</small>`], ["Group", r => r.cat], ["Status", r => bd(r.status)]], act: A(), on: {edit: r => modal("Edit tag", fld("Name", "n", r.name) + fld("Description", "d", r.desc) + fld("Group", "g", r.cat), () => {
+          r.name = $("#n").value;
+          r.desc = $("#d").value;
+          r.cat = $("#g").value;
+          T2.draw();
+          toast("Tag updated.")
+        }), tog: r => {
+          r.status = r.status == "Active" ? "Inactive" : "Active"
+        }, del: r => del(TAGS, r, "Tag")}});
+        $("#a1").onclick = () => modal("Add category", fld("Name", "n") + fld("Description", "d"), () => {
+          if (!$("#n").value) {
+            toast("Enter a category name.");
+            return false
+          }
+          CATS.unshift({id: Date.now(), name: $("#n").value, desc: $("#d").value, status: "Active"});
+          T1.draw();
+          toast("Category added.")
+        }, "Add category");
+        $("#a2").onclick = () => modal("Add tag", fld("Name", "n") + fld("Description", "d") + fld("Group", "g", "Web"), () => {
+          if (!$("#n").value) {
+            toast("Enter a tag name.");
+            return false
+          }
+          TAGS.unshift({id: Date.now(), name: $("#n").value, desc: $("#d").value, cat: $("#g").value, status: "Active"});
+          T2.draw();
+          toast("Tag added.")
+        }, "Add tag")
+      }
+    </script>
+  </body>
+</html>

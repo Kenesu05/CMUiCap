@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Role &amp; Access Management | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="admin-role-access.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <a class="bk" href="admin-dashboard.html">← Back to Dashboard</a>
+          <h1>Role &amp; Access Management</h1>
+          <p class="sub">Manage user roles, permissions, and access levels.</p>
+          <section class="stats" id="st"></section>
+          <div class="tbar">
+            <input aria-label="Search" id="q" placeholder="Search by name or email" type="search"/>
+            <select id="f1"><option value="">All roles</option><option>System Administrator</option><option>Faculty</option><option>Student</option></select>
+            <select id="f2"><option value="">All statuses</option><option>Active</option><option>Inactive</option><option>Pending</option></select>
+          </div>
+          <div class="card">
+            <div id="t"></div>
+            <p class="sub" id="cnt"></p>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+      function init() {
+        const P = {"System Administrator": ["Manage users", "Manage emails", "Manage roles", "Manage categories", "View logs", "System settings"], Faculty: ["Review topics", "Run similarity", "Verify projects", "View repository"], Student: ["Browse projects", "Check similarity", "Get recommendations", "Save to archive"]};
+        const ALL = [...new Set(Object.values(P).flat())];
+        const D = [{id: 0, name: "Admin", email: "admin@cityofmalabonuniversity.edu.ph", label: "System Administrator", status: "Active", last: "Aug 27, 2025 10:12 AM"}, ...USERS].map(u => ({...u, label: u.label || u.role, perms: [...P[u.label || u.role]]}));
+        const st = () => stats("#st", [["Total Users", D.length, "👥", "s1"], ["System Administrator", D.filter(u => u.label == "System Administrator").length, "🛡", "s6"], ["Faculty", D.filter(u => u.label == "Faculty").length, "👥", "s3"], ["Students", D.filter(u => u.label == "Student").length, "🎓", "s2"]]);
+        st();
+        const T = dt({el: "#t", q: "#q", f: {"#f1": "label", "#f2": "status"}, count: "#cnt", data: () => D, cols: [["User", r => `<b>${esc(r.name)}</b><br><small>${esc(r.email)}</small>`], ["Role", r => r.label], ["Permissions", r => r.perms.length + " granted"], ["Account status", r => bd(r.status)], ["Last access", r => r.last]], act: [["role", "Assign Role"], ["perm", "Permissions"]], on: {role: u => u.id === 0 ? toast("The Admin account is managed by the system.") : modal("Assign role to " + esc(u.name), sel("Role", "rr", ["Faculty", "Student"], u.label), () => {
+          u.label = $("#rr").value;
+          u.perms = [...P[u.label]];
+          st();
+          T.draw();
+          toast("Role updated to " + u.label + ".")
+        }), perm: u => modal("Permissions — " + esc(u.name), ALL.map(p => `<div class="set">${p}${sw(u.perms.includes(p))}</div>`).join(""), () => {
+          u.perms = [...document.querySelectorAll("#mdl .set")].filter(s => s.querySelector("input").checked).map(s => s.firstChild.textContent.trim());
+          T.draw();
+          toast("Permissions saved.")
+        })}})
+      }
+    </script>
+  </body>
+</html>

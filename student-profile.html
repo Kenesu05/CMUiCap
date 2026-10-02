@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>Profile | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="student-profile.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <header class="top" id="top"></header>
+    <main>
+      <section class="banner">
+        <span class="bi">👤</span>
+        <div>
+          <h1>Profile</h1>
+          <p>Manage your account information and settings.</p>
+        </div>
+      </section>
+      <div class="lay" style="grid-template-columns:300px 1fr">
+        <aside class="card" style="text-align:center">
+          <div class="bi" style="width:110px;height:110px;font-size:50px;margin:0 auto 12px;background:#1664ff;color:#fff">👤</div>
+          <h2 id="nm"></h2>
+          <span class="badge">Student</span>
+          <div id="pf" style="text-align:left;margin-top:16px"></div>
+        </aside>
+        <section class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <h2>✎ Edit Profile</h2>
+              <small>Update your nickname and personal information.</small>
+            </div>
+            <button class="btn" id="sv">Save Changes</button>
+          </div>
+          <div class="lay" style="grid-template-columns:1fr 1fr">
+            <div>
+              <h3 style="color:#0a2a8a;margin-bottom:10px">Basic Information</h3>
+              <label>Full name<input disabled="" id="fn"/></label>
+              <label>Nickname<input id="nk" maxlength="20"/><small id="nc">0/20</small></label>
+              <label>Student ID<input disabled="" id="sid"/></label>
+              <label>CMU-CCS email<input disabled="" id="em"/></label>
+            </div>
+            <div>
+              <h3 style="color:#0a2a8a;margin-bottom:10px">Academic Information</h3>
+              <label>Program<input disabled="" id="pg"/></label>
+              <label>Academic year<input disabled="" id="ay"/></label>
+              <label>Account status<input disabled="" id="as"/></label>
+            </div>
+          </div>
+          <div class="set2">
+            <span><b>Change Password</b><br/><small>Keep your account secure.</small></span>
+            <button class="out" id="cp">Change Password</button>
+          </div>
+          <div class="set2">
+            <span><b>Account Settings</b><br/><small>Manage notification preferences.</small></span>
+            <button class="out" id="ac">Account Settings</button>
+          </div>
+          <button class="out" id="lo" style="margin-top:14px;color:#e0314f;border-color:#e0314f">Log Out</button>
+        </section>
+      </div>
+    </main>
+    <div class="modal" id="modal"></div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="student.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const nick = U.nickname || "";
+        $("#nm").textContent = U.name;
+        $("#fn").value = U.name;
+        $("#nk").value = nick;
+        $("#sid").value = U.studentId;
+        $("#em").value = U.email;
+        $("#pg").value = U.program;
+        $("#ay").value = U.academicYear;
+        $("#as").value = U.status;
+        $("#nc").textContent = nick.length + "/20";
+        $("#pf").innerHTML = [["Nickname", nick || "—"], ["Student ID", U.studentId], ["CMU-CCS email", U.email], ["Program", U.program], ["Academic year", U.academicYear], ["Role", "Student"], ["Account status", U.status]].map(r => `<p style="margin-bottom:10px"><small style="text-align:left">${r[0]}</small><b style="font-size:13px;word-break:break-all">${r[1]}</b></p>`).join("");
+        $("#nk").oninput = () => $("#nc").textContent = $("#nk").value.length + "/20";
+        $("#sv").onclick = () => {
+          U.nickname = $("#nk").value;
+          localStorage.setItem("cmuicapCurrentUser", JSON.stringify(U));
+          toast("Profile saved.");
+          $("#pf").firstChild.querySelector("b").textContent = U.nickname || "—"
+        };
+        $("#cp").onclick = () => smodal("Change password", '<p class="sub">Enter and confirm your new password.</p><label>New password<input type="password"></label>', () => {
+          toast("Password updated.")
+        }, "Update");
+        $("#ac").onclick = () => smodal("Account settings", '<label><span><input type="checkbox" checked> Email notifications</span></label><label><span><input type="checkbox" checked> Recommendation updates</span></label>', () => {
+          toast("Settings saved.")
+        });
+        $("#lo").onclick = () => {
+          localStorage.removeItem("cmuicapCurrentUser");
+          location.href = "index.html"
+        }
+
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>System Settings | CMUiCAP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="admin-settings.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="app">
+      <aside id="side"></aside>
+      <div>
+        <header class="tb" id="tb"></header>
+        <main>
+          <a class="bk" href="admin-dashboard.html">← Back to Dashboard</a>
+          <h1>System Settings</h1>
+          <p class="sub">Configure system preferences and academic-year settings.</p>
+          <div class="cols">
+            <section class="card">
+              <h2>General Settings</h2>
+              <div class="fg">
+                <label>System name<input value="CMUiCAP"/></label>
+                <label>Organization<input value="City of Malabon University — College of Computer Studies"/></label>
+                <label>Contact email<input value="support@cityofmalabonuniversity.edu.ph"/></label>
+              </div>
+            </section>
+            <section class="card">
+              <h2>System Information</h2>
+              <div class="set">System Name<b>CMUiCAP</b></div>
+              <div class="set">System Status<span class="pill">Operational</span></div>
+              <div class="set">Environment<b>Capstone Project</b></div>
+              <div class="set">Version<b>1.0</b></div>
+            </section>
+          </div>
+          <div class="cols">
+            <section class="card">
+              <h2>Academic Year</h2>
+              <div class="set">
+                <span>Current academic year<small>2025–2026 · First Semester</small></span>
+                <a class="btn ghost" href="admin-academic-years.html">Manage academic years</a>
+              </div>
+            </section>
+            <section class="card">
+              <h2>Notifications</h2>
+              <div class="set">
+                <span>Email notifications<small>Configure SMTP, templates and preferences</small></span>
+                <a class="btn ghost" href="admin-email-settings.html">Email settings</a>
+              </div>
+              <div class="set">Enable system notifications<span id="s1"></span></div>
+            </section>
+          </div>
+          <div class="cols">
+            <section class="card">
+              <h2>Account Settings</h2>
+              <div class="set">Require CMU-CCS email for sign-in<span id="s2"></span></div>
+              <div class="set">Require OTP verification<span id="s3"></span></div>
+              <div class="set">Allow self-registration<span id="s4"></span></div>
+            </section>
+            <section class="card">
+              <h2>Password Policy</h2>
+              <div class="fg">
+                <label>Minimum length<input type="number" value="8"/></label>
+                <label>Password expiry<select><option>90 days</option><option>60 days</option><option>Never</option></select></label>
+              </div>
+              <div class="set">Require numbers<span id="s5"></span></div>
+              <div class="set">Require uppercase letters<span id="s6"></span></div>
+            </section>
+          </div>
+          <button class="btn" id="save">Save changes</button>
+        </main>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+    <script>
+      function init() {
+        ["s1", "s2", "s3", "s5", "s6"].forEach(i => $("#" + i).innerHTML = sw(true));
+        $("#s4").innerHTML = sw(false);
+        $("#save").onclick = () => toast("Settings saved.")
+      }
+    </script>
+  </body>
+</html>
