@@ -75,7 +75,7 @@
         $("#ay").value = U.academicYear;
         $("#as").value = U.status;
         $("#nc").textContent = nick.length + "/20";
-        $("#pf").innerHTML = [["Nickname", nick || "—"], ["Student ID", U.studentId], ["CMU-CCS email", U.email], ["Program", U.program], ["Academic year", U.academicYear], ["Role", "Student"], ["Account status", U.status]].map(r => `<p style="margin-bottom:10px"><small style="text-align:left">${r[0]}</small><b style="font-size:13px;word-break:break-all">${r[1]}</b></p>`).join("");
+        $("#pf").innerHTML = [["Nickname:", nick || "—"], ["Student ID", U.studentId], ["CMU-CCS email", U.email], ["Program", U.program], ["Academic year", U.academicYear], ["Role", "Student"], ["Account status", U.status]].map(r => `<p style="margin-bottom:10px"><small style="text-align:left">${r[0]}</small><b style="font-size:13px;word-break:break-all">${r[1]}</b></p>`).join("");
         $("#nk").oninput = () => $("#nc").textContent = $("#nk").value.length + "/20";
         $("#sv").onclick = () => {
           U.nickname = $("#nk").value;
